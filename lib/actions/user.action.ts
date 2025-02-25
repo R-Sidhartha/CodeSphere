@@ -71,6 +71,8 @@ export async function deleteUser(params: DeleteUserParams) {
 
     const deletedUser = await User.findOneAndDelete(user._id);
 
+    return deletedUser;
+
     // revalidatePath(path);
   } catch (err) {
     console.error(err);
