@@ -18,9 +18,9 @@ export async function POST(req: Request) {
 
   // Get headers
   const headerPayload = await headers();
-  const svix_id = headerPayload.get("svix-id");
-  const svix_timestamp = headerPayload.get("svix-timestamp");
-  const svix_signature = headerPayload.get("svix-signature");
+  const svix_id = headerPayload.get("svix-id") ?? "";
+  const svix_timestamp = headerPayload.get("svix-timestamp") ?? "";
+  const svix_signature = headerPayload.get("svix-signature") ?? "";
 
   // If there are no headers, error out
   if (!svix_id || !svix_timestamp || !svix_signature) {
@@ -93,4 +93,16 @@ export async function POST(req: Request) {
   }
 
   return new Response("Webhook received", { status: 200 });
+}
+
+export async function GET() {
+  return new Response("Method Not Allowed", { status: 405 });
+}
+
+export async function PUT() {
+  return new Response("Method Not Allowed", { status: 405 });
+}
+
+export async function DELETE() {
+  return new Response("Method Not Allowed", { status: 405 });
 }
