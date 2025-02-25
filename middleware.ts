@@ -5,12 +5,12 @@ const isPublicRoute = createRouteMatcher([
   "/api/webhooks(.*)",
   "/sign-in(.*)",
   "/sign-up(.*)",
-  "question/:id",
-  "/tags",
-  "/tags/:id",
-  "/profile/:id",
-  "/community",
-  "/jobs",
+  "question/:id(.*)",
+  "/tags(.*)",
+  "/tags/:id(.*)",
+  "/profile/:id(.*)",
+  "/community(.*)",
+  "/jobs(.*)",
 ]);
 
 // const isignoredRoute = createRouteMatcher(["/api/webhooks", "/api/chatgpt"]);

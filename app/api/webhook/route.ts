@@ -94,15 +94,3 @@ export async function POST(req: Request) {
 
   return new Response("Webhook received", { status: 200 });
 }
-
-export async function GET() {
-  return new Response("Method Not Allowed", { status: 405 });
-}
-
-export async function PUT() {
-  return new Response("Method Not Allowed", { status: 405 });
-}
-
-export async function DELETE() {
-  return new Response("Method Not Allowed", { status: 405 });
-}
