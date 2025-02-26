@@ -29,7 +29,7 @@ const QuestionCard = ({ _id, title, tags, author, upvotes, views, answers, creat
                 <div>
                     <span className='subtle-regular text-dark400_light700 line-clamp-1 flex sm:hidden '>{getTimestamp(createdAt)}</span>
                     <Link
-                        href={`/questions/${_id}`}
+                        href={`/question/${_id}`}
                     >
                         <h3 className='sm:h3-semibold base-semibold text-dark200_light900 line-clamp-1 flex-1 '>
                             {title}
