@@ -20,28 +20,34 @@ import { Button } from "@/components/ui/button"
 import { QuestionSchema } from "@/lib/validations"
 import { Badge } from '../ui/badge';
 import Image from 'next/image';
-import { createQuestion } from '@/lib/actions/question.action';
+import { createQuestion, editQuestion } from '@/lib/actions/question.action';
 import { usePathname, useRouter } from 'next/navigation';
-
-const type: any = 'create';
+import { useTheme } from '@/context/ThemeProvider';
 
 interface Props {
+    type?: string;
     mongoUserId: string;
+    questionDetails?: string;
 }
 
-const Question = ({ mongoUserId }: Props) => {
+const Question = ({ type, questionDetails, mongoUserId }: Props) => {
+    const { mode } = useTheme();
     const editorRef = useRef(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const router = useRouter();
     const pathname = usePathname();
 
+    const parsedQuestionDetails = JSON.parse(questionDetails || '')
+
+    const groupedTags = parsedQuestionDetails.tags.map((tag: any) => tag.name)
+
     const form = useForm<z.infer<typeof QuestionSchema>>({
         resolver: zodResolver(QuestionSchema),
         defaultValues: {
-            title: "",
-            explanation: "",
-            tags: []
+            title: parsedQuestionDetails.title || "",
+            explanation: parsedQuestionDetails.content || "",
+            tags: groupedTags || []
         },
     })
 
@@ -50,15 +56,31 @@ const Question = ({ mongoUserId }: Props) => {
         setIsSubmitting(true);
 
         try {
-            await createQuestion({
-                title: values.title,
-                content: values.explanation,
-                tags: values.tags,
-                author: JSON.parse(mongoUserId),
-                path: pathname
-            })
 
-            router.push('/');
+            if (type === 'Edit') {
+
+                await editQuestion({
+                    questionId: parsedQuestionDetails._id,
+                    title: values.title,
+                    content: values.explanation,
+                    path: pathname
+
+                })
+
+                router.push(`/question/${parsedQuestionDetails._id}`)
+
+            } else {
+
+                await createQuestion({
+                    title: values.title,
+                    content: values.explanation,
+                    tags: values.tags,
+                    author: JSON.parse(mongoUserId),
+                    path: pathname
+                })
+                router.push('/');
+            }
+
 
         } catch (error) {
 
@@ -136,7 +158,7 @@ const Question = ({ mongoUserId }: Props) => {
                                     onInit={(_evt, editor) => editorRef.current = editor}
                                     onBlur={field.onBlur}
                                     onEditorChange={(content) => field.onChange(content)}
-                                    initialValue=""
+                                    initialValue={parsedQuestionDetails.content || ''}
                                     init={{
                                         height: 350,
                                         menubar: false,
@@ -148,7 +170,9 @@ const Question = ({ mongoUserId }: Props) => {
                                         toolbar: 'undo redo | blocks | ' +
                                             'codesample | bold italic forecolor | alignleft aligncenter ' +
                                             'alignright alignjustify | bullist numlist',
-                                        content_style: 'body { font-family:Inter; font-size:16px }'
+                                        content_style: 'body { font-family:Inter; font-size:16px }',
+                                        skin: mode === "dark" ? "oxide-dark" : "oxide",
+                                        content_css: mode === "dark" ? "dark" : "light",
                                     }}
                                 />
                             </FormControl>
@@ -171,6 +195,7 @@ const Question = ({ mongoUserId }: Props) => {
                             <FormControl className="mt-3.5">
                                 <div>
                                     <Input
+                                        disabled={type === 'Edit'}
                                         placeholder="Add tags..."
                                         className="no-focus paragraph-regular background-light700_dark300 light-border-2 text-dark300_light700 min-h-[56px] border"
                                         onKeyDown={(e) => handleInputKeyDown(e, field)}
@@ -180,7 +205,7 @@ const Question = ({ mongoUserId }: Props) => {
                                             {field.value.map((tag: any) => (
                                                 <Badge key={tag} className="subtle-medium background-light800_dark300 text-light400_light500 flex items-center justify-center gap-2 rounded-md border-none px-4 py-2 capitalize">
                                                     {tag}
-                                                    <Image
+                                                    {type !== 'Edit' && (<Image
                                                         src="/assets/icons/close.svg"
                                                         alt="close icon"
                                                         width={12}
@@ -188,6 +213,7 @@ const Question = ({ mongoUserId }: Props) => {
                                                         className="cursor-pointer object-contain invert-0 dark:invert"
                                                         onClick={() => { handleTagRemove(tag, field) }}
                                                     />
+                                                    )}
                                                 </Badge>
                                             ))}
                                         </div>
@@ -204,11 +230,11 @@ const Question = ({ mongoUserId }: Props) => {
                 <Button type="submit" className='primary-gradient w-fit !text-light-900' disabled={isSubmitting} >
                     {isSubmitting ? (
                         <>
-                            {type === 'edit' ? 'Editing...' : 'Posting...'}
+                            {type === 'Edit' ? 'Editing...' : 'Posting...'}
                         </>
                     ) : (
                         <>
-                            {type === 'edit' ? 'Edit Question' : 'Ask a Question'}
+                            {type === 'Edit' ? 'Edit Question' : 'Ask a Question'}
                         </>
                     )}
                 </Button>

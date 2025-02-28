@@ -39,15 +39,44 @@ export const getTimestamp = (createdAt: Date): string => {
   return `${diffInYears} year${diffInYears === 1 ? "" : "s"} ago`;
 };
 
+// export const formatNumber = (num: number): string => {
+//   if (num >= 1_000_000_000) {
+//     return (num / 1_000_000_000).toFixed(1).replace(/\.0$/, "") + "B"; // Billion
+//   }
+//   if (num >= 1_000_000) {
+//     return (num / 1_000_000).toFixed(1).replace(/\.0$/, "") + "M"; // Million
+//   }
+//   if (num >= 1_000) {
+//     return (num / 1_000).toFixed(1).replace(/\.0$/, "") + "K"; // Thousand
+//   }
+//   return num.toString(); // If less than 1K, return as is
+// };
+
 export const formatNumber = (num: number): string => {
   if (num >= 1_000_000_000) {
-    return (num / 1_000_000_000).toFixed(1).replace(/\.0$/, "") + "B"; // Billion
+    return `${parseFloat((num / 1_000_000_000).toFixed(1))}B`; // Billion
   }
   if (num >= 1_000_000) {
-    return (num / 1_000_000).toFixed(1).replace(/\.0$/, "") + "M"; // Million
+    return `${parseFloat((num / 1_000_000).toFixed(1))}M`; // Million
   }
   if (num >= 1_000) {
-    return (num / 1_000).toFixed(1).replace(/\.0$/, "") + "K"; // Thousand
+    return `${parseFloat((num / 1_000).toFixed(1))}K`; // Thousand
   }
   return num.toString(); // If less than 1K, return as is
+};
+
+export const parseJoinedDate = (dateString: Date | string): string => {
+  const date = new Date(dateString);
+
+  if (isNaN(date.getTime())) {
+    throw new Error("Invalid date format");
+  }
+
+  const options: Intl.DateTimeFormatOptions = {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  };
+
+  return date.toLocaleDateString("en-GB", options).replace(",", "");
 };

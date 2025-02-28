@@ -2,38 +2,13 @@ import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 import RenderTag from './RenderTag'
+import { getHotQuestions } from '@/lib/actions/question.action'
+import { getPopularTags } from '@/lib/actions/tag.action'
 
-const RightSidebar = () => {
-    const hotQuestions = [
-        {
-            _id: "1",
-            title: 'this is first question'
-        },
-        {
-            _id: "2",
-            title: 'this is second question'
-        },
-        {
-            _id: "3",
-            title: 'this is third question'
-        },
-        {
-            _id: "4",
-            title: 'this is fourth question'
-        },
-        {
-            _id: "5",
-            title: 'this is fifth question'
-        },
-    ]
+const RightSidebar = async () => {
+    const hotQuestions = await getHotQuestions()
 
-    const popularTags = [
-        { _id: "1", name: "javascript", totalQuestions: 5 },
-        { _id: "2", name: "nextjs", totalQuestions: 4 },
-        { _id: "3", name: "react", totalQuestions: 2 },
-        { _id: "4", name: "taiwind", totalQuestions: 1 },
-        { _id: "5", name: "redux", totalQuestions: 0 }
-    ]
+    const popularTags = await getPopularTags()
 
     return (
         <section className='background-light900_dark200 light-border sticky right-0 top-0 flex h-screen flex-col overflow-y-auto border-l p-6 pt-36 shadow-ligh-300 dark:shadow-none max-xl:hidden w-[350px] custom-scrollbar'>
@@ -66,7 +41,7 @@ const RightSidebar = () => {
                             key={tag._id}
                             _id={tag._id}
                             name={tag.name}
-                            totalQuestions={tag.totalQuestions}
+                            totalQuestions={tag.numberOfQuestions}
                             showCount
                         />
                     ))}

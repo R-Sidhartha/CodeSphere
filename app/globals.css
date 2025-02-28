@@ -1,4 +1,5 @@
 @import url("../styles/theme.css");
+@import url("../styles/prism.css");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

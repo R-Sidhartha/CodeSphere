@@ -1,3 +1,5 @@
+'use client'
+
 import { SignedIn, UserButton } from '@clerk/nextjs'
 import Image from 'next/image'
 import Link from 'next/link'
