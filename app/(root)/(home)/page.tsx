@@ -6,18 +6,18 @@ import LocalSearchbar from '@/components/shared/search/LocalSearchbar'
 import { Button } from '@/components/ui/button'
 import { HomePageFilters } from '@/constants/filters'
 import { getQuestions } from '@/lib/actions/question.action'
-import { SearchParamsProps } from '@/types'
 import Link from 'next/link'
 import React from 'react'
 
-const Home = async ({ searchParams }: { searchParams?: Record<string, string> }) => {
+const Home = async (props: { searchParams?: Promise<Record<string, string>> }) => {
+    const searchParams = await props.searchParams;
 
-    const searchQuery = searchParams?.q || ''; // Ensure it's a string
+    const searchQuery = searchParams?.q || '';
 
 
-    const questions = await getQuestions({
+    const questions = (await getQuestions({
         searchQuery: searchQuery
-    }) || [];;
+    })) || [];
 
     return (
         <>

@@ -27,12 +27,12 @@ export async function getQuestions(params: GetQuestionsParams) {
     if (searchQuery) {
       query.$or = [
         { title: { $regex: new RegExp(searchQuery, "i") } },
-        // { content: { $regex: new RegExp(searchQuery, "i") } },
+        { content: { $regex: new RegExp(searchQuery, "i") } },
       ];
     }
 
     const skip = (page - 1) * pageSize;
-    const questions = await Question.find({ query })
+    const questions = await Question.find(query)
       .populate({ path: "tags", model: Tag })
       .populate({ path: "author", model: User })
       .sort({ createdAt: -1 });

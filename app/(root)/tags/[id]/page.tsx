@@ -6,14 +6,23 @@ import LocalSearchbar from '@/components/shared/search/LocalSearchbar';
 import { getQuestionsByTagId } from '@/lib/actions/tag.action'
 import React from 'react'
 
-const Page = async (props: { params: Promise<{ id: string }> }) => {
-    const params = await props.params;
+interface PageProps {
+    params: Promise<{ id: string }>;
+    searchParams?: Promise<Record<string, string>>;
+}
 
-    const tagId = params?.id
+const Page = async ({ params, searchParams }: PageProps) => {
+    const resolvedParams = await params;
+    const resolvedSearchParams = await searchParams;
+
+    const searchQuery = resolvedSearchParams?.q || '';
+
+
+    const tagId = resolvedParams?.id
     const result = await getQuestionsByTagId({
         tagId: tagId,
         page: 1,
-        searchQuery: ""
+        searchQuery: searchQuery
     })
 
 
@@ -23,7 +32,7 @@ const Page = async (props: { params: Promise<{ id: string }> }) => {
 
             <div className='mt-11 w-full'>
                 <LocalSearchbar
-                    route='/'
+                    route={`/tags/${tagId}`}
                     iconPosition='left'
                     imgSrc='/assets/icons/search.svg'
                     placeholder='Search for tag questions'

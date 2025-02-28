@@ -6,9 +6,14 @@ import { getAllUsers } from '@/lib/actions/user.action'
 import Link from 'next/link'
 import React from 'react'
 
-const Page = async () => {
+const Page = async (props: { searchParams?: Promise<Record<string, string>> }) => {
+    const searchParams = await props.searchParams;
 
-    const users = await getAllUsers({})
+    const searchQuery = searchParams?.q || '';
+
+    const users = await getAllUsers({
+        searchQuery: searchQuery
+    })
 
     return (
         <>
