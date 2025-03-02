@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import React, { useRef, useState } from 'react'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '../ui/form'
 import { useForm } from 'react-hook-form'
