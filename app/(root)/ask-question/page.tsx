@@ -4,6 +4,7 @@ import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import React, { Suspense } from 'react'
 import type { Metadata } from 'next'
+import Loading from './loading';
 
 export const metadata: Metadata = {
     title: 'Ask a Question | CodeSphere',
@@ -23,7 +24,10 @@ const Page = async () => {
         <div>
             <h1 className='h1-bold text-dark100_light900'>Ask a question</h1>
             <div className='mt-9'>
-                <Question mongoUserId={JSON.stringify(mongoUser?._id)} />
+                <Suspense fallback={<Loading />}>
+                    <Question mongoUserId={JSON.stringify(mongoUser?._id)} />
+                </Suspense>
+
             </div>
         </div>
     )
