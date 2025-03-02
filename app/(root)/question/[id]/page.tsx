@@ -38,7 +38,6 @@ const Page = async ({ params, searchParams }: PageProps) => {
     }
 
     const question = await getQuestionById({ questionId: questionId })
-
     const { userId: clerkId } = await auth();
 
     let mongoUser;
@@ -68,11 +67,11 @@ const Page = async ({ params, searchParams }: PageProps) => {
                         <Votes
                             type='Question'
                             itemId={JSON.stringify(question._id)}
-                            userId={JSON.stringify(mongoUser._id)}
+                            userId={JSON.stringify(mongoUser?._id)}
                             upvotes={question.upvotes.length}
                             downvotes={question.downvotes.length}
-                            hasupVoted={question.upvotes.includes(mongoUser._id)}
-                            hasdownVoted={question.downvotes.includes(mongoUser._id)}
+                            hasupVoted={question.upvotes.includes(mongoUser?._id)}
+                            hasdownVoted={question.downvotes.includes(mongoUser?._id)}
                             hasSaved={mongoUser?.saved.includes(question._id)}
                         />
                     </div>
@@ -109,8 +108,8 @@ const Page = async ({ params, searchParams }: PageProps) => {
             <ParseHTMLWrapper data={question.content} />
 
             <div className='mt-8 flex flex-wrap gap-2'>
-                {question.tags.map((tag: any) => (
-                    <RenderTag key={tag._id} name={tag.name} _id={tag._id} showCount={false} />
+                {question?.tags?.map((tag: any) => (
+                    <RenderTag key={tag?._id} name={tag?.name} id={tag?._id} showCount={false} />
                 ))}
             </div>
 

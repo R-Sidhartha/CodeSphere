@@ -24,7 +24,14 @@ const Collection
         const { userId } = await auth();
 
         if (!userId) {
-            return null;
+            return (
+                <NoResult
+                    title="You have to be logged in to Save or View your collection"
+                    description='Unlock the full experience! Log in to save questions and access your collection seamlessly. Keep track of valuable discussions and never lose sight of the knowledge that matters to you.'
+                    link='/sign-in'
+                    linkTitle='Log In'
+                />
+            )
         }
 
         const result = await getSavedQuestions({

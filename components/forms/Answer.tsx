@@ -11,6 +11,7 @@ import { Button } from '../ui/button'
 import Image from 'next/image'
 import { CreateAnswer } from '@/lib/actions/answer.action'
 import { usePathname } from 'next/navigation'
+import { toast } from 'sonner';
 
 interface Props {
     questionId: string;
@@ -32,6 +33,16 @@ const Answer = ({ questionId, authorId, questionTitle, questionContent }: Props)
         }
     })
     const handleCreateAnswer = async (values: z.infer<typeof AnswerSchema>) => {
+        if (!authorId) {
+            toast.error("Please log in", {
+                description: "You must be logged in to Answer.",
+            });
+            if (editorRef.current) {
+                const editor = editorRef.current as any;
+                editor.setContent('')
+            }
+            return;
+        }
         setisSubmitting(true);
         try {
 
