@@ -13,7 +13,7 @@ const RightSidebar = async () => {
         <section className="background-light900_dark200 light-border sticky right-0 top-0 flex h-screen flex-col overflow-y-auto border-l p-6 pt-36 shadow-ligh-300 dark:shadow-none max-xl:hidden w-[350px] custom-scrollbar">
             <div>
                 <h3 className="h3-bold text-dark200_light900">Top Questions</h3>
-                {hotQuestions.length > 2 ? (
+                {hotQuestions.length > 0 ? (
                     <div className="mt-7 flex w-full flex-col gap-[30px]">
                         {hotQuestions.map((question) => (
                             <Link
@@ -43,7 +43,7 @@ const RightSidebar = async () => {
 
             <div className="mt-16">
                 <h3 className="h3-bold text-dark200_light900">Popular Tags</h3>
-                {popularTags.length > 3 ? (
+                {popularTags.length > 0 ? (
                     <div className="mt-7 flex flex-col gap-4">
                         {popularTags.map((tag) => (
                             <RenderTag
