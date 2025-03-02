@@ -5,6 +5,7 @@ import {
 import { Inter, Space_Grotesk } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from '@/context/ThemeProvider'
+import { Suspense } from 'react'
 
 
 const inter = Inter({
@@ -44,7 +45,9 @@ export default function RootLayout({
           }}
         >
           <ThemeProvider>
-            {children}
+            <Suspense>
+              {children}
+            </Suspense>
           </ThemeProvider>
         </ClerkProvider>
       </body>
