@@ -323,7 +323,7 @@ export async function getRecommendedQuestions(params: RecommendedParams) {
     }, []);
 
     const distinctUserTagIds = [
-      ...new set(userTags.map((tag: any) => tag._id)),
+      ...new Set(userTags.map((tag: any) => tag._id)),
     ];
 
     const query: FilterQuery<typeof Question> = {
