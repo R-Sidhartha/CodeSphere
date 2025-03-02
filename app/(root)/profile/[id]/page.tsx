@@ -11,13 +11,25 @@ import ProfileLink from '@/components/shared/ProfileLink';
 import Stats from '@/components/shared/Stats';
 import QuestionTab from '@/components/shared/QuestionTab';
 import AnswersTab from '@/components/shared/AnswersTab';
+import type { Metadata } from 'next'
 
-const Page = async (props: { params: Promise<{ id: string }> }) => {
+export const metadata: Metadata = {
+    title: 'Profile | CodeSphere',
+}
+
+interface PageProps {
+    params: Promise<{ id: string }>;
+    searchParams?: Promise<Record<string, string>>;
+}
+
+const Page = async ({ params, searchParams }: PageProps) => {
+    const Params = await params;
+    const SearchParams = await searchParams;
+
 
     const { userId: clerkId } = await auth()
-    const params = await props.params;
 
-    const userId = params?.id
+    const userId = Params?.id
 
     const userInfo = await getUserInfo({ userId: userId })
     return (
@@ -77,8 +89,10 @@ const Page = async (props: { params: Promise<{ id: string }> }) => {
             </div>
 
             <Stats
+                reputation={userInfo.reputation}
                 totalQuestions={userInfo?.totalQuestions}
                 totalAnswers={userInfo?.totalAnswers}
+                badges={userInfo?.badgeCounts}
             />
 
             <div className='mt-10 flex gap-10'>
@@ -87,14 +101,15 @@ const Page = async (props: { params: Promise<{ id: string }> }) => {
                         <TabsTrigger value="top-posts" className='tab'>Top Posts</TabsTrigger>
                         <TabsTrigger value="answers" className='tab'>Answers</TabsTrigger>
                     </TabsList>
-                    <TabsContent value="top-posts">
+                    <TabsContent value="top-posts" className='mt-5 flex w-full flex-col gap-6'>
                         <QuestionTab
-                            // searchParams={searchParams ? searchParams: ''}
+                            SearchParams={SearchParams}
                             userId={userInfo?.user._id}
                             clerkId={userId}
                         /></TabsContent>
                     <TabsContent value="answers">
                         <AnswersTab
+                            SearchParams={SearchParams}
                             userId={userInfo?.user._id}
                             clerkId={userId}
                         />

@@ -19,12 +19,29 @@ export async function CreateAnswer(params: CreateAnswerParams) {
     const { content, author, question, path } = params;
     const newAnswer = await Answer.create({ content, author, question });
 
-    await Question.findByIdAndUpdate(question, {
+    const questionObject = await Question.findByIdAndUpdate(question, {
       $push: { answers: newAnswer._id },
     });
 
+    // const tags: mongoose.Types.ObjectId[] = (questionObject.tags as string[])
+    //   .map((tag: string) =>
+    //     mongoose.Types.ObjectId.isValid(tag)
+    //       ? new mongoose.Types.ObjectId(tag)
+    //       : null
+    //   )
+    //   .filter((tag): tag is mongoose.Types.ObjectId => tag !== null);
+
+    await Interaction.create({
+      user: author,
+      action: "answer",
+      question,
+      answer: newAnswer._id,
+      tags: questionObject.tags,
+    });
+
+    await User.findByIdAndUpdate(author, { $inc: { reputation: 10 } });
+
     revalidatePath(path);
-    // return newAnswer;
   } catch (error) {
     console.log("Error while creating answer", error);
     return null;
@@ -33,15 +50,43 @@ export async function CreateAnswer(params: CreateAnswerParams) {
 export async function getAnswers(params: GetAnswersParams) {
   try {
     connectToDatabase();
-    const { questionId } = params;
+    const { questionId, sortBy, page = 1, pageSize = 10 } = params;
+
+    let sortOptions = {};
+
+    switch (sortBy) {
+      case "highestUpvotes":
+        sortOptions = { upvotes: -1 };
+        break;
+      case "lowestUpvotes":
+        sortOptions = { upvotes: 1 };
+        break;
+      case "recent":
+        sortOptions = { createdAt: -1 };
+        break;
+      case "old":
+        sortOptions = { createdAt: 1 };
+        break;
+      default:
+        break;
+    }
+
+    const skip = (page - 1) * pageSize;
+
     const answers = await Answer.find({ question: questionId })
       .populate({
         path: "author",
         model: User,
         select: "name _id clerkId picture",
       })
-      .sort({ createdAt: -1 });
-    return answers;
+      .sort(sortOptions)
+      .skip(skip)
+      .limit(pageSize);
+
+    const totalAnswers = await Answer.countDocuments({ question: questionId });
+    const isNext = totalAnswers > skip + answers.length;
+
+    return { answers, isNext };
   } catch (error) {
     console.log("Error while creating answer", error);
     return null;
@@ -75,6 +120,13 @@ export async function upvoteAnswer(params: AnswerVoteParams) {
       throw new Error("Answer not found");
     }
 
+    await User.findByIdAndUpdate(userId, {
+      $inc: { reputation: hasupVoted ? -2 : 2 },
+    });
+    await User.findByIdAndUpdate(answer.author, {
+      $inc: { reputation: hasupVoted ? -10 : 10 },
+    });
+
     revalidatePath(path);
   } catch (error) {
     console.log(error);
@@ -107,6 +159,13 @@ export async function downvoteAnswer(params: AnswerVoteParams) {
     if (!answer) {
       throw new Error("Answer not found");
     }
+
+    await User.findByIdAndUpdate(userId, {
+      $inc: { reputation: hasdownVoted ? -2 : 2 },
+    });
+    await User.findByIdAndUpdate(answer.author, {
+      $inc: { reputation: hasdownVoted ? -10 : 10 },
+    });
 
     revalidatePath(path);
   } catch (error) {

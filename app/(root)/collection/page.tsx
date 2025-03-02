@@ -1,11 +1,17 @@
 import QuestionCard from '@/components/cards/QuestionCard'
 import Filter from '@/components/shared/Filter'
 import NoResult from '@/components/shared/NoResult'
+import Pagination from '@/components/shared/Pagination'
 import LocalSearchbar from '@/components/shared/search/LocalSearchbar'
 import { QuestionFilters } from '@/constants/filters'
 import { getSavedQuestions } from '@/lib/actions/user.action'
 import { auth } from '@clerk/nextjs/server'
 import React from 'react'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+    title: 'Collections | CodeSphere',
+}
 
 const Collection
     = async (props: { searchParams?: Promise<Record<string, string>> }) => {
@@ -13,6 +19,7 @@ const Collection
         const searchParams = await props.searchParams;
 
         const searchQuery = searchParams?.q || '';
+        const searchFilter = searchParams?.filters || '';
 
         const { userId } = await auth();
 
@@ -20,9 +27,11 @@ const Collection
             return null;
         }
 
-        const questions = await getSavedQuestions({
+        const result = await getSavedQuestions({
             clerkId: userId,
-            searchQuery: searchQuery
+            searchQuery: searchQuery,
+            filter: searchFilter,
+            page: searchParams?.page ? +searchParams.page : 1
         });
 
         return (
@@ -45,7 +54,7 @@ const Collection
                 </div>
 
                 <div className='mt-10 flex w-full gap-6 flex-col'>
-                    {(questions ?? []).length > 0 ? (questions?.map((question: any) => (
+                    {result.savedQuestion.length > 0 ? (result.savedQuestion?.map((question: any) => (
                         <QuestionCard
                             key={question._id}
                             _id={question._id}
@@ -63,6 +72,12 @@ const Collection
                         link='/ask-question'
                         linkTitle='Ask a Question'
                     />}
+                </div>
+                <div className='mt-10'>
+                    <Pagination
+                        pageNumber={searchParams?.page ? +searchParams.page : 1}
+                        isNext={result?.isNext}
+                    />
                 </div>
             </>
         )

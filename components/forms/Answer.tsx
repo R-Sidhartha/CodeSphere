@@ -15,12 +15,15 @@ import { usePathname } from 'next/navigation'
 interface Props {
     questionId: string;
     authorId: string;
+    questionTitle: string;
+    questionContent: string;
 }
-const Answer = ({ questionId, authorId }: Props) => {
+const Answer = ({ questionId, authorId, questionTitle, questionContent }: Props) => {
 
     const pathname = usePathname()
     const { mode } = useTheme();
     const [isSubmitting, setisSubmitting] = useState(false);
+    const [isSubmittingAI, setisSubmittingAI] = useState(false);
     const editorRef = useRef(null)
     const form = useForm<z.infer<typeof AnswerSchema>>({
         resolver: zodResolver(AnswerSchema),
@@ -51,20 +54,63 @@ const Answer = ({ questionId, authorId }: Props) => {
             setisSubmitting(false)
         }
     }
+
+    const generateAIAnswer = async () => {
+        if (!authorId) {
+            return;
+        }
+
+        setisSubmittingAI(true);
+
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/chatgpt`, {
+                method: 'POST',
+                body: JSON.stringify({ questionTitle, questionContent })
+            })
+
+            if (!response.ok) {
+                throw new Error(`Server Error: ${response.status} - ${response.statusText}`);
+            }
+
+            const aiAnswer = await response.json();
+            if (aiAnswer?.reply) {
+                const formattedAnswer = aiAnswer.reply.replace(/\n/g, '<br/>')
+                if (editorRef.current) {
+                    const editor = editorRef.current as any;
+                    editor.setContent(formattedAnswer)
+                }
+            } else {
+                console.error("No reply received from AI.");
+            }
+        } catch (error) {
+            console.log(error)
+        } finally {
+            setisSubmittingAI(false);
+        }
+    }
+
     return (
         <div>
             <div className='flex flex-col justify-between gap-5 sm:flex-row sm:items-center sm:gap-2 mt-4'>
                 <h4 className='paragraph-semibold text-dark400_light800'>Write your answers here</h4>
                 <Button className='btn light-border-2 gap-1.5 rounded-md px-4 py-2.5 text-primary-500 shadow-none dark:text-primary-500'
-                    onClick={() => { }}>
-                    <Image
-                        src='/assets/icons/stars.svg'
-                        alt='stars'
-                        width={12}
-                        height={12}
-                        className='object-contain'
-                    />
-                    Generate an AI answer
+                    onClick={generateAIAnswer}>
+                    {isSubmittingAI ? (
+                        <>
+                            Generating...
+                        </>
+                    ) : (
+                        <>
+                            <Image
+                                src='/assets/icons/stars.svg'
+                                alt='stars'
+                                width={12}
+                                height={12}
+                                className='object-contain'
+                            />
+                            Generate an AI answer
+                        </>
+                    )}
                 </Button>
             </div>
             <Form {...form}>

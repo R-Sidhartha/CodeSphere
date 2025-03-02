@@ -14,12 +14,24 @@ import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 // const ParseHTML = dynamic(() => import('@/components/shared/ParseHTML'), { ssr: false });
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+    title: 'Question Details | CodeSphere',
+}
+
+interface PageProps {
+    params: Promise<{ id: string }>;
+    searchParams?: Promise<Record<string, string>>;
+}
 
 
-const Page = async (props: { params: Promise<{ id: string }> }) => {
-    const params = await props.params;
+const Page = async ({ params, searchParams }: PageProps) => {
+    const resolvedParams = await params;
+    const resolvedSearchParams = await searchParams;
+    const searchFilter = resolvedSearchParams?.filters || '';
 
-    const questionId = params?.id
+    const questionId = resolvedParams?.id
 
     if (!questionId) {
         return <p className="text-red-500">Invalid Question ID.</p>;
@@ -106,11 +118,15 @@ const Page = async (props: { params: Promise<{ id: string }> }) => {
                 questionId={question._id}
                 authorId={mongoUser?._id}
                 totalAnswers={question.answers.length}
+                filter={searchFilter}
+                page={resolvedSearchParams?.page}
             />
 
             <Answer
                 questionId={question._id.toString()}
                 authorId={mongoUser?._id?.toString()}
+                questionTitle={question.title}
+                questionContent={question.content}
             />
 
         </>

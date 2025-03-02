@@ -35,7 +35,7 @@ const ParseHTML = ({ data }: Props) => {
         Prism.highlightAll();
     }, [])
     return (
-        <div className="whitespace-pre-wrap break-words overflow-auto w-11/12">
+        <div className="whitespace-pre-wrap break-words overflow-auto w-11/12 markdown min-w-full">
             {parse(data)}
         </div>
     )

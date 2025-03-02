@@ -3,6 +3,11 @@ import { getQuestionById } from '@/lib/actions/question.action'
 import { getUserById } from '@/lib/actions/user.action'
 import { auth } from '@clerk/nextjs/server'
 import React from 'react'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+    title: 'Edit Question | CodeSphere',
+}
 
 const Page = async (props: { params: Promise<{ id: string }> }) => {
     const params = await props.params;

@@ -1,19 +1,28 @@
 import Filter from '@/components/shared/Filter'
 import NoResult from '@/components/shared/NoResult'
+import Pagination from '@/components/shared/Pagination'
 import LocalSearchbar from '@/components/shared/search/LocalSearchbar'
-import { UserFilters } from '@/constants/filters'
+import { TagFilters } from '@/constants/filters'
 import { getAllTags } from '@/lib/actions/tag.action'
 import Link from 'next/link'
 import React from 'react'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+    title: 'Tags | CodeSphere',
+}
 
 const Page = async (props: { searchParams?: Promise<Record<string, string>> }) => {
     const searchParams = await props.searchParams;
 
     const searchQuery = searchParams?.q || '';
+    const searchFilter = searchParams?.filters || '';
 
 
-    const tags = await getAllTags({
-        searchQuery: searchQuery
+    const result = await getAllTags({
+        searchQuery: searchQuery,
+        filter: searchFilter,
+        page: searchParams?.page ? +searchParams.page : 1
     })
 
     return (
@@ -29,12 +38,12 @@ const Page = async (props: { searchParams?: Promise<Record<string, string>> }) =
                 />
 
                 <Filter
-                    filters={UserFilters}
+                    filters={TagFilters}
                     otherClasses='min-h-[56px] sm:min-w-[170px]'
                 />
             </div>
             <section className='mt-12 flex flex-wrap gap-4'>
-                {tags.length > 0 ? tags?.map((tag) => (
+                {result.tags.length > 0 ? result.tags?.map((tag) => (
                     <Link
                         href={`/tags/${tag._id}`}
                         key={tag._id}
@@ -58,6 +67,12 @@ const Page = async (props: { searchParams?: Promise<Record<string, string>> }) =
                     />
                 )}
             </section>
+            <div className='mt-10'>
+                <Pagination
+                    pageNumber={searchParams?.page ? +searchParams.page : 1}
+                    isNext={result?.isNext}
+                />
+            </div>
         </>
     )
 }

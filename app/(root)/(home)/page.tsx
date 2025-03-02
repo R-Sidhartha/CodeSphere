@@ -5,19 +5,49 @@ import NoResult from '@/components/shared/NoResult'
 import LocalSearchbar from '@/components/shared/search/LocalSearchbar'
 import { Button } from '@/components/ui/button'
 import { HomePageFilters } from '@/constants/filters'
-import { getQuestions } from '@/lib/actions/question.action'
+import { getQuestions, getRecommendedQuestions } from '@/lib/actions/question.action'
 import Link from 'next/link'
 import React from 'react'
+import Pagination from '../../../components/shared/Pagination'
+import type { Metadata } from 'next'
+import { auth } from '@clerk/nextjs/server'
+
+export const metadata: Metadata = {
+    title: 'Home | CodeSphere',
+    description: 'CodeSphere is a community of great developers and programmers. Join us and enhance your learning experience'
+}
 
 const Home = async (props: { searchParams?: Promise<Record<string, string>> }) => {
     const searchParams = await props.searchParams;
 
     const searchQuery = searchParams?.q || '';
+    const searchFilter = searchParams?.filter || '';
+
+    const { userId } = await auth()
+
+    let result;
+    if (searchFilter === 'recommended') {
+        if (userId) {
+            result = await getRecommendedQuestions({
+                userId,
+                searchQuery: searchQuery,
+                page: searchParams?.page ? +searchParams.page : 1
+            });
+        } else {
+            result = {
+                questions: [],
+                isNext: false
+            }
+        }
+    } else {
+        result = await getQuestions({
+            searchQuery: searchQuery,
+            filter: searchFilter,
+            page: searchParams?.page ? +searchParams.page : 1
+        });
+    }
 
 
-    const questions = (await getQuestions({
-        searchQuery: searchQuery
-    })) || [];
 
     return (
         <>
@@ -47,7 +77,7 @@ const Home = async (props: { searchParams?: Promise<Record<string, string>> }) =
             <HomeFilters />
 
             <div className='mt-10 flex w-full gap-6 flex-col'>
-                {(questions ?? []).length > 0 ? (questions?.map((question) => (
+                {result?.questions.length! > 0 ? (result?.questions?.map((question) => (
                     <QuestionCard
                         key={question._id}
                         _id={question._id}
@@ -65,6 +95,12 @@ const Home = async (props: { searchParams?: Promise<Record<string, string>> }) =
                     link='/ask-question'
                     linkTitle='Ask a Question'
                 />}
+            </div>
+            <div className='mt-10'>
+                <Pagination
+                    pageNumber={searchParams?.page ? +searchParams.page : 1}
+                    isNext={result?.isNext}
+                />
             </div>
         </>
     )

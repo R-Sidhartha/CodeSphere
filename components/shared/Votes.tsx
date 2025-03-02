@@ -8,6 +8,7 @@ import { formatNumber } from '@/lib/utils';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import React, { useEffect } from 'react'
+import { toast } from 'sonner';
 
 interface Props {
     type: string;
@@ -35,7 +36,9 @@ const Votes = ({
     const router = useRouter();
     const handleVote = async (action: string) => {
         if (!userId) {
-            return;
+            return toast("Please log in", {
+                description: "You must be logged in to upvote.",
+            });
         }
         if (action === 'upvote') {
             if (type === 'Question') {
@@ -55,7 +58,11 @@ const Votes = ({
                     path: pathname,
                 })
             }
-            return;
+
+            const variant = hasupVoted ? "error" : "success";
+
+            return toast[variant](`Upvote ${hasupVoted ? 'Removed' : 'Successfull'}`);
+
         }
 
         if (action === 'downvote') {
@@ -76,7 +83,9 @@ const Votes = ({
                     path: pathname,
                 })
             }
-            return;
+            const variant = hasdownVoted ? "error" : "success";
+
+            return toast[variant](`downVote ${hasdownVoted ? 'Removed' : 'Successfull'}`);
         }
 
 
@@ -88,6 +97,9 @@ const Votes = ({
             questionId: JSON.parse(itemId),
             path: pathname,
         })
+
+        const variant = hasSaved ? "error" : "success";
+        return toast[variant](` ${hasSaved ? 'Removed from collection' : 'Successfull added to the collection'}`);
     }
 
     useEffect(() => {

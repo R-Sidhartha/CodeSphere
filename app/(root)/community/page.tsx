@@ -1,19 +1,29 @@
 import UserCard from '@/components/cards/UserCard'
 import Filter from '@/components/shared/Filter'
+import Pagination from '@/components/shared/Pagination'
 import LocalSearchbar from '@/components/shared/search/LocalSearchbar'
 import { UserFilters } from '@/constants/filters'
 import { getAllUsers } from '@/lib/actions/user.action'
 import Link from 'next/link'
 import React from 'react'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+    title: 'Community | CodeSphere',
+}
 
 const Page = async (props: { searchParams?: Promise<Record<string, string>> }) => {
     const searchParams = await props.searchParams;
 
     const searchQuery = searchParams?.q || '';
+    const searchFilter = searchParams?.filters || '';
 
-    const users = await getAllUsers({
-        searchQuery: searchQuery
+    const result = await getAllUsers({
+        searchQuery: searchQuery,
+        filter: searchFilter,
+        page: searchParams?.page ? +searchParams.page : 1
     })
+
 
     return (
         <>
@@ -33,7 +43,7 @@ const Page = async (props: { searchParams?: Promise<Record<string, string>> }) =
                 />
             </div>
             <section className='mt-12 flex flex-wrap gap-4'>
-                {users.length > 0 ? users?.map((user) => (
+                {result?.users.length > 0 ? result?.users?.map((user) => (
                     <UserCard
                         key={user._id}
                         user={user}
@@ -48,6 +58,12 @@ const Page = async (props: { searchParams?: Promise<Record<string, string>> }) =
                     </div>
                 )}
             </section>
+            <div className='mt-10'>
+                <Pagination
+                    pageNumber={searchParams?.page ? +searchParams.page : 1}
+                    isNext={result?.isNext}
+                />
+            </div>
         </>
     )
 }

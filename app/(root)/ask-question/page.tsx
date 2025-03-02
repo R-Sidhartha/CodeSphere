@@ -3,7 +3,12 @@ import { getUserById } from '@/lib/actions/user.action';
 import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import React from 'react'
+import type { Metadata } from 'next'
 
+export const metadata: Metadata = {
+    title: 'Ask a Question | CodeSphere',
+    description: 'Ask and share programming questions on the Codesphere platform. Get answers from the community, explore discussions, and enhance your coding knowledge.'
+}
 const Page = async () => {
 
     const { userId } = await auth();

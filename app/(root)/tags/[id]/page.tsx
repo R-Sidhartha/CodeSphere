@@ -1,10 +1,16 @@
 
 import QuestionCard from '@/components/cards/QuestionCard';
 import NoResult from '@/components/shared/NoResult';
+import Pagination from '@/components/shared/Pagination';
 import LocalSearchbar from '@/components/shared/search/LocalSearchbar';
 // import { IQuestion } from '@/database/models/qustion.model';
 import { getQuestionsByTagId } from '@/lib/actions/tag.action'
 import React from 'react'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+    title: 'Tag Details | CodeSphere',
+}
 
 interface PageProps {
     params: Promise<{ id: string }>;
@@ -21,10 +27,9 @@ const Page = async ({ params, searchParams }: PageProps) => {
     const tagId = resolvedParams?.id
     const result = await getQuestionsByTagId({
         tagId: tagId,
-        page: 1,
+        page: resolvedSearchParams?.page ? +resolvedSearchParams.page : 1,
         searchQuery: searchQuery
     })
-
 
     return (
         <>
@@ -59,6 +64,12 @@ const Page = async ({ params, searchParams }: PageProps) => {
                     link='/ask-question'
                     linkTitle='Ask a Question'
                 />}
+            </div>
+            <div className='mt-10'>
+                <Pagination
+                    pageNumber={resolvedSearchParams?.page ? +resolvedSearchParams.page : 1}
+                    isNext={result?.isNext}
+                />
             </div>
         </>
     )
