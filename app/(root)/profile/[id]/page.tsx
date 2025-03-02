@@ -12,6 +12,7 @@ import Stats from '@/components/shared/Stats';
 import QuestionTab from '@/components/shared/QuestionTab';
 import AnswersTab from '@/components/shared/AnswersTab';
 import type { Metadata } from 'next'
+import { redirect } from 'next/navigation';
 
 export const metadata: Metadata = {
     title: 'Profile | CodeSphere',
@@ -30,6 +31,10 @@ const Page = async ({ params, searchParams }: PageProps) => {
     const { userId: clerkId } = await auth()
 
     const userId = Params?.id
+
+    if (!userId) {
+        redirect("/sign-in");
+    }
 
     const userInfo = await getUserInfo({ userId: userId })
     return (

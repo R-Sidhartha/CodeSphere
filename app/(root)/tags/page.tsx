@@ -48,7 +48,7 @@ const Page = async (props: { searchParams: Promise<{ [key: string]: string | und
                         href={`/tags/${tag._id}`}
                         key={tag._id}
                         className='shadow-light200_darknone flex justify-between gap-2'>
-                        <article className='background-light900_dark200 light-border flex flex-col w-full rounded-2xl border px-8 py-10 sm:w-[260px]'>
+                        <article className='background-light900_dark200 light-border flex flex-col w-full rounded-2xl border px-8 py-10 sm:w-[240px]'>
                             <div className='background-light800_dark400 w-fit rounded-sm px-5 py-1.5'>
                                 <p className='paragraph-semibold text-dark300_light900 line-clamp-1'>{tag.name}</p>
                             </div>
