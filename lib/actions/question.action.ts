@@ -315,6 +315,11 @@ export async function getRecommendedQuestions(params: RecommendedParams) {
       .populate("tags")
       .exec();
 
+    if (!userInteractions.length) {
+      console.warn("No user interactions found for user:", user._id);
+      return { questions: [], isNext: false };
+    }
+
     const userTags = userInteractions.reduce((tags, interaction) => {
       if (interaction.tags) {
         tags = tags.concat(interaction.tags);
@@ -325,6 +330,11 @@ export async function getRecommendedQuestions(params: RecommendedParams) {
     const distinctUserTagIds = [
       ...new Set(userTags.map((tag: any) => tag._id)),
     ];
+
+    if (distinctUserTagIds.length === 0) {
+      console.warn("User has no tag interactions, returning empty results.");
+      return { questions: [], isNext: false };
+    }
 
     const query: FilterQuery<typeof Question> = {
       $and: [
@@ -359,6 +369,6 @@ export async function getRecommendedQuestions(params: RecommendedParams) {
     return { questions: recommendedQuestions, isNext };
   } catch (error) {
     console.error("Error getting recomended questions", error);
-    throw error;
+    return { questions: [], isNext: false };
   }
 }

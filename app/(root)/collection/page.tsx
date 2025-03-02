@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 }
 
 const Collection
-    = async (props: { searchParams?: Promise<Record<string, string>> }) => {
+    = async (props: { searchParams: Promise<{ [key: string]: string | undefined }> }) => {
 
         const searchParams = await props.searchParams;
 

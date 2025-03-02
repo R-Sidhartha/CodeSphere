@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     title: 'Tags | CodeSphere',
 }
 
-const Page = async (props: { searchParams?: Promise<Record<string, string>> }) => {
+const Page = async (props: { searchParams: Promise<{ [key: string]: string | undefined }> }) => {
     const searchParams = await props.searchParams;
 
     const searchQuery = searchParams?.q || '';

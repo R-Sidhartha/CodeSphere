@@ -12,16 +12,27 @@ export const metadata: Metadata = {
     title: 'Community | CodeSphere',
 }
 
-const Page = async (props: { searchParams?: Promise<Record<string, string>> }) => {
-    const searchParams = await props.searchParams;
+const Page = async (props: { searchParams: Promise<{ [key: string]: string | undefined }> }) => {
 
-    const searchQuery = searchParams?.q || '';
-    const searchFilter = searchParams?.filters || '';
+    // const { page = '1', filters = '', q = '' } = await props.searchParams
+    const searchQuery = (await props.searchParams).q
+    const searchFilter = (await props.searchParams).filters
+    const page = (await props.searchParams).page
 
+    // const searchParams = await props.searchParams;
+
+    // const searchQuery = searchParams?.q || '';
+    // const searchFilter = searchParams?.filters || '';
+
+    // const result = await getAllUsers({
+    //     searchQuery: searchQuery,
+    //     filter: searchFilter,
+    //     page: searchParams?.page ? +searchParams.page : 1
+    // })
     const result = await getAllUsers({
         searchQuery: searchQuery,
         filter: searchFilter,
-        page: searchParams?.page ? +searchParams.page : 1
+        page: page ? +page : 1
     })
 
 
@@ -60,7 +71,8 @@ const Page = async (props: { searchParams?: Promise<Record<string, string>> }) =
             </section>
             <div className='mt-10'>
                 <Pagination
-                    pageNumber={searchParams?.page ? +searchParams.page : 1}
+                    pageNumber={page ? +page : 1}
+                    // pageNumber={searchParams?.page ? +searchParams.page : 1}
                     isNext={result?.isNext}
                 />
             </div>

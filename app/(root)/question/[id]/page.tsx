@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 
 interface PageProps {
     params: Promise<{ id: string }>;
-    searchParams?: Promise<Record<string, string>>;
+    searchParams: Promise<{ [key: string]: string | undefined }>;
 }
 
 

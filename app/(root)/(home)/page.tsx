@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     description: 'CodeSphere is a community of great developers and programmers. Join us and enhance your learning experience'
 }
 
-const Home = async (props: { searchParams?: Promise<Record<string, string>> }) => {
+const Home = async (props: { searchParams: Promise<{ [key: string]: string | undefined }> }) => {
     const searchParams = await props.searchParams;
 
     const searchQuery = searchParams?.q || '';
