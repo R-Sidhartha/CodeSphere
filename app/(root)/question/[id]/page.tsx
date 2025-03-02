@@ -109,7 +109,7 @@ const Page = async ({ params, searchParams }: PageProps) => {
 
             <div className='mt-8 flex flex-wrap gap-2'>
                 {question?.tags?.map((tag: any) => (
-                    <RenderTag key={tag?._id} name={tag?.name} id={tag?._id} showCount={false} />
+                    <RenderTag key={tag?._id} name={tag?.name} _id={tag?._id} showCount={false} />
                 ))}
             </div>
 
